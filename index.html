@@ -3,67 +3,400 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+    <title>Freedom Web Access</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        /* Modern, clean design */
+        :root {
+            --primary: #8a2be2;
+            --primary-dark: #6a1fb0;
+            --secondary: #f5f5f5;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --bg-color: #ffffff;
+            --input-bg: #f8f9fa;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            background-color: #f5f5f5;
+            padding: 0;
         }
-        .redirect-container {
-            text-align: center;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
             padding: 20px;
-            background: white;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .proxy-panel {
+            background: var(--secondary);
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
         }
-        h2 {
-            color: #8a2be2;
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
         }
-        .loading {
-            margin: 20px 0;
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(138, 43, 226, 0.2);
-            border-radius: 50%;
-            border-top-color: #8a2be2;
-            animation: spin 1s ease-in-out infinite;
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+            background: var(--input-bg);
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        .browse-btn {
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            flex: 1;
+            margin-right: 10px;
+            padding: 10px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .option:last-child {
+            margin-right: 0;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .option.active {
+            border-color: var(--primary);
+            background-color: rgba(138, 43, 226, 0.1);
+        }
+
+        #browser-frame {
+            width: 100%;
+            height: 600px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            background: white;
+        }
+
+        .status {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .status.error {
+            background-color: #ffebee;
+            color: #c62828;
+            display: block;
+            border: 1px solid #ffcdd2;
+        }
+
+        .status.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+            border: 1px solid #c8e6c9;
+        }
+
+        .bookmarks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .bookmark {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bookmark:hover {
+            border-color: var(--primary);
+            background-color: var(--input-bg);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .options {
+                flex-direction: column;
+            }
+            
+            .option {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            #browser-frame {
+                height: 400px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="redirect-container">
-        <h2>Redirecting you now...</h2>
-        <div class="loading"></div>
-        <p id="target-url">Please wait...</p>
+    <div class="container">
+        <header>
+            <h1>Freedom Web Access</h1>
+            <p class="subtitle">Browse the web without restrictions</p>
+        </header>
+        
+        <div id="status-msg" class="status"></div>
+        
+        <div class="proxy-panel">
+            <div class="input-group">
+                <input type="text" id="url-input" placeholder="Enter URL (e.g. google.com)" value="example.com">
+                <button id="go-btn">Go</button>
+            </div>
+            
+            <div class="bookmarks">
+                <div class="bookmark" data-url="google.com">Google</div>
+                <div class="bookmark" data-url="youtube.com">YouTube</div>
+                <div class="bookmark" data-url="reddit.com">Reddit</div>
+                <div class="bookmark" data-url="twitter.com">Twitter</div>
+                <div class="bookmark" data-url="instagram.com">Instagram</div>
+            </div>
+            
+            <div class="options">
+                <div class="option active" data-mode="direct">Direct Mode</div>
+                <div class="option" data-mode="decode">Base64 Decode</div>
+                <div class="option" data-mode="cors">CORS Bypass</div>
+            </div>
+            
+            <button id="browse-btn" class="browse-btn">Browse Now</button>
+        </div>
+        
+        <iframe id="browser-frame" title="Browsing Frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        
+        <footer>
+            <p>© 2025 Freedom Web Access | Created for educational purposes only</p>
+            <p>Not affiliated with any websites browsed through this service</p>
+        </footer>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Parse the URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetUrl = urlParams.get('url');
-            
-            if (targetUrl) {
-                // Display the target URL
-                document.getElementById('target-url').textContent = `Going to: ${targetUrl}`;
-                
-                // Redirect after a short delay
-                setTimeout(function() {
-                    window.location.href = targetUrl;
-                }, 1500);
-            } else {
-                document.getElementById('target-url').textContent = 'Error: No target URL specified';
+        // DOM Elements
+        const urlInput = document.getElementById('url-input');
+        const goButton = document.getElementById('go-btn');
+        const browseButton = document.getElementById('browse-btn');
+        const browserFrame = document.getElementById('browser-frame');
+        const statusMsg = document.getElementById('status-msg');
+        const options = document.querySelectorAll('.option');
+        const bookmarks = document.querySelectorAll('.bookmark');
+        
+        // Available proxy services
+        const proxyServices = {
+            direct: (url) => {
+                // Use GitHub's raw content as a simple proxy
+                return `https://raw.githack.com/y018gaming/HTML-Site/main/redirect.html?url=${encodeURIComponent(url)}`;
+            },
+            decode: (url) => {
+                // Base64 encoding can sometimes bypass simple filters
+                return `data:text/html;base64,${btoa(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta http-equiv="refresh" content="0;url=${url}">
+                    </head>
+                    <body>
+                        <p>Redirecting to ${url}...</p>
+                        <script>window.location.href="${url}";</script>
+                    </body>
+                    </html>
+                `)}`;
+            },
+            cors: (url) => {
+                // Use a reliable CORS proxy service
+                return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
             }
+        };
+        
+        // Event listeners for mode options
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove active class from all options
+                options.forEach(opt => opt.classList.remove('active'));
+                // Add active class to clicked option
+                option.classList.add('active');
+            });
+        });
+        
+        // Function to process URL format
+        function processUrl(url) {
+            // Add https:// if missing
+            if (!/^https?:\/\//i.test(url)) {
+                return 'https://' + url;
+            }
+            return url;
+        }
+        
+        // Function to navigate to URL
+        function navigateTo(url) {
+            // Get processed URL
+            const processedUrl = processUrl(url);
+            
+            // Get selected mode
+            const mode = document.querySelector('.option.active').getAttribute('data-mode');
+            
+            try {
+                // Show loading status
+                showStatus(`Loading ${url} using ${mode} mode...`, 'success');
+                
+                // Apply selected proxy service
+                const proxyUrl = proxyServices[mode](processedUrl);
+                
+                // Navigate the iframe
+                browserFrame.src = proxyUrl;
+                
+                // Save to localStorage
+                localStorage.setItem('lastUrl', url);
+                localStorage.setItem('lastMode', mode);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Function to show status messages
+        function showStatus(message, type) {
+            statusMsg.textContent = message;
+            statusMsg.className = `status ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMsg.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Event listeners
+        goButton.addEventListener('click', () => {
+            navigateTo(urlInput.value.trim());
+        });
+        
+        browseButton.addEventListener('click', () => {
+            navigateTo(urlInput.value.trim());
+        });
+        
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                navigateTo(urlInput.value.trim());
+            }
+        });
+        
+        // Add click handlers for bookmarks
+        bookmarks.forEach(bookmark => {
+            bookmark.addEventListener('click', () => {
+                const url = bookmark.getAttribute('data-url');
+                urlInput.value = url;
+                navigateTo(url);
+            });
+        });
+        
+        // Load last used URL and mode on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const lastUrl = localStorage.getItem('lastUrl');
+            const lastMode = localStorage.getItem('lastMode');
+            
+            if (lastUrl) {
+                urlInput.value = lastUrl;
+            }
+            
+            if (lastMode) {
+                options.forEach(option => {
+                    if (option.getAttribute('data-mode') === lastMode) {
+                        options.forEach(opt => opt.classList.remove('active'));
+                        option.classList.add('active');
+                    }
+                });
+            }
+            
+            // Load a default page
+            navigateTo(urlInput.value.trim());
         });
     </script>
 </body>
