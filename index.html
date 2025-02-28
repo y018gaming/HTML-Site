@@ -1,203 +1,402 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Working Proxy</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      color: #333;
-      text-align: center;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #status {
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 4px;
-      display: none;
-    }
-    #status.error {
-      background-color: #ffebee;
-      color: #c62828;
-      display: block;
-    }
-    #status.success {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-      display: block;
-    }
-    #content {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      min-height: 400px;
-      overflow: auto;
-    }
-    .proxy-options {
-      margin-bottom: 15px;
-      padding: 10px;
-      background-color: #f9f9f9;
-      border-radius: 4px;
-    }
-    .proxy-option {
-      margin-bottom: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stealth Web Proxy</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #818cf8;
+            --background-color: #f3f4f6;
+            --surface-color: #ffffff;
+            --text-color: #1f2937;
+            --text-secondary-color: #6b7280;
+            --border-color: #e5e7eb;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .app-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .proxy-form {
+            background-color: var(--surface-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            background-color: var(--surface-color);
+            cursor: pointer;
+        }
+
+        .form-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.375rem;
+            color: white;
+            background-color: var(--primary-color);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+            width: 100%;
+        }
+
+        .form-button:hover {
+            background-color: #4338ca;
+        }
+
+        .form-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+        }
+
+        .proxy-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .proxy-option input {
+            margin-right: 0.5rem;
+        }
+
+        .proxy-settings {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .settings-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+        }
+
+        .proxy-frame {
+            width: 100%;
+            height: 600px;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--surface-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .status-message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .status-message.error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+
+        .status-message.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            display: block;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary-color);
+        }
+
+        .quick-access {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .quick-access-button {
+            padding: 0.5rem 0.75rem;
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .quick-access-button:hover {
+            background-color: #f3f4f6;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .proxy-form {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Simple Working Proxy</h1>
-    
-    <div class="form-group">
-      <label for="url">Enter URL to access:</label>
-      <input type="text" id="url" placeholder="https://example.com" value="https://example.com">
+    <div class="container">
+        <h1 class="app-title">Stealth Web Proxy</h1>
+        
+        <div id="status-message" class="status-message"></div>
+        
+        <div class="proxy-form">
+            <div class="form-group">
+                <label for="url-input" class="form-label">Enter URL to access:</label>
+                <input type="text" id="url-input" class="form-input" placeholder="https://example.com" value="https://google.com">
+            </div>
+            
+            <div class="quick-access">
+                <button class="quick-access-button" data-url="https://google.com">Google</button>
+                <button class="quick-access-button" data-url="https://youtube.com">YouTube</button>
+                <button class="quick-access-button" data-url="https://reddit.com">Reddit</button>
+                <button class="quick-access-button" data-url="https://discord.com">Discord</button>
+            </div>
+            
+            <div class="proxy-settings">
+                <h3 class="settings-title">Proxy Settings</h3>
+                
+                <div class="proxy-option">
+                    <input type="radio" id="proxy-uv" name="proxy-service" value="uv" checked>
+                    <label for="proxy-uv">Ultraviolet (Best JS Support)</label>
+                </div>
+                
+                <div class="proxy-option">
+                    <input type="radio" id="proxy-dynamic" name="proxy-service" value="dynamic">
+                    <label for="proxy-dynamic">Dynamic (Better Compatibility)</label>
+                </div>
+                
+                <div class="proxy-option">
+                    <input type="radio" id="proxy-womginx" name="proxy-service" value="womginx">
+                    <label for="proxy-womginx">Womginx (Fast Loading)</label>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <button id="access-button" class="form-button">Access Website</button>
+            </div>
+        </div>
+        
+        <iframe id="proxy-frame" class="proxy-frame" title="Proxied Content" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        
+        <div class="footer">
+            <p>This proxy is for educational purposes only. Use responsibly.</p>
+        </div>
     </div>
-    
-    <div class="proxy-options">
-      <div class="proxy-option">
-        <input type="radio" id="proxy1" name="proxy" value="https://api.allorigins.win/raw?url=" checked>
-        <label for="proxy1">AllOrigins Proxy</label>
-      </div>
-      <div class="proxy-option">
-        <input type="radio" id="proxy2" name="proxy" value="https://corsproxy.io/?">
-        <label for="proxy2">CORS Proxy</label>
-      </div>
-      <div class="proxy-option">
-        <input type="radio" id="proxy3" name="proxy" value="https://api.codetabs.com/v1/proxy?quest=">
-        <label for="proxy3">CodeTabs Proxy</label>
-      </div>
-    </div>
-    
-    <button onclick="fetchContent()">Load Website</button>
-    
-    <div id="status"></div>
-    
-    <div id="content">
-      <p>Enter a URL above and click "Load Website" to see the content here.</p>
-    </div>
-  </div>
 
-  <script>
-    function fetchContent() {
-      const url = document.getElementById('url').value;
-      const statusElement = document.getElementById('status');
-      const contentElement = document.getElementById('content');
-      const selectedProxy = document.querySelector('input[name="proxy"]:checked').value;
-      
-      if (!url) {
-        showStatus('Please enter a valid URL', 'error');
-        return;
-      }
-      
-      showStatus('Loading content...', 'success');
-      
-      // Clear previous content
-      contentElement.innerHTML = '<p>Loading...</p>';
-      
-      const proxyUrl = selectedProxy + encodeURIComponent(url);
-      
-      fetch(proxyUrl)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.text();
-        })
-        .then(data => {
-          // Process the content to make it display correctly
-          // For HTML content, we'll need to fix relative URLs to absolute
-          let processedContent = data;
-          
-          // Create a temporary element to parse the HTML
-          const tempElement = document.createElement('div');
-          tempElement.innerHTML = processedContent;
-          
-          // Fix relative URLs in src and href attributes
-          const baseUrl = new URL(url);
-          const baseOrigin = baseUrl.origin;
-          const basePath = baseUrl.pathname.substring(0, baseUrl.pathname.lastIndexOf('/') + 1);
-          
-          // Fix links
-          tempElement.querySelectorAll('[src], [href]').forEach(element => {
-            ['src', 'href'].forEach(attr => {
-              if (element.hasAttribute(attr)) {
-                const value = element.getAttribute(attr);
-                if (value && !value.startsWith('http') && !value.startsWith('//') && !value.startsWith('#') && !value.startsWith('data:')) {
-                  if (value.startsWith('/')) {
-                    element.setAttribute(attr, baseOrigin + value);
-                  } else {
-                    element.setAttribute(attr, baseOrigin + basePath + value);
-                  }
-                }
-              }
-            });
-          });
-          
-          // Display the processed content
-          contentElement.innerHTML = tempElement.innerHTML;
-          
-          showStatus('Content loaded successfully!', 'success');
-        })
-        .catch(error => {
-          console.error('Error fetching the URL:', error);
-          showStatus('Error loading the URL: ' + error.message, 'error');
-          contentElement.innerHTML = '<p>Failed to load content. Try a different proxy server or URL.</p>';
+    <script>
+        // Proxy endpoints
+        const proxyServices = {
+            uv: {
+                name: "Ultraviolet",
+                // Note: These are examples only - in a real implementation, you'd use your own deployed instances
+                endpoints: [
+                    "https://mathsspot.com/service/hvtrs8%2F-",
+                    "https://ultraviolet-node-2.vercel.app/service/hvtrs8%2F-",
+                    "https://math.skool.lol/service/hvtrs8%2F-"
+                ]
+            },
+            dynamic: {
+                name: "Dynamic",
+                endpoints: [
+                    "https://dynamicback.vercel.app/dynamic/",
+                    "https://mathematics.vercel.app/dynamic/",
+                    "https://classroomhelp.vercel.app/dynamic/"
+                ]
+            },
+            womginx: {
+                name: "Womginx",
+                endpoints: [
+                    "https://womginx.vercel.app/main/",
+                    "https://womginx.arph.org/main/",
+                    "https://womginx.ramaru.repl.co/main/"
+                ]
+            }
+        };
+        
+        // DOM elements
+        const urlInput = document.getElementById('url-input');
+        const proxyFrame = document.getElementById('proxy-frame');
+        const accessButton = document.getElementById('access-button');
+        const statusMessage = document.getElementById('status-message');
+        const quickAccessButtons = document.querySelectorAll('.quick-access-button');
+        
+        // Function to show status messages
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + type;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Function to encode URL for Ultraviolet proxy
+        function encodeUrl(url) {
+            return url.replace(/https?:\/\//g, '')
+                      .replace(/\//g, '%2F')
+                      .replace(/-/g, '%2D')
+                      .replace(/\./g, '%2E')
+                      .replace(/_/g, '%5F');
+        }
+        
+        // Function to load website through proxy
+        function loadProxiedSite() {
+            let url = urlInput.value.trim();
+            
+            // Check if URL is valid
+            if (!url) {
+                showStatus('Please enter a valid URL', 'error');
+                return;
+            }
+            
+            // Add https:// if missing
+            if (!/^https?:\/\//i.test(url)) {
+                url = 'https://' + url;
+                urlInput.value = url;
+            }
+            
+            // Get selected proxy service
+            const selectedProxyType = document.querySelector('input[name="proxy-service"]:checked').value;
+            const proxyService = proxyServices[selectedProxyType];
+            
+            if (!proxyService) {
+                showStatus('Invalid proxy service selected', 'error');
+                return;
+            }
+            
+            // Choose a random endpoint from the available ones
+            const endpoint = proxyService.endpoints[Math.floor(Math.random() * proxyService.endpoints.length)];
+            let proxyUrl;
+            
+            // Format URL based on proxy type
+            if (selectedProxyType === 'uv') {
+                proxyUrl = endpoint + encodeUrl(url);
+            } else {
+                proxyUrl = endpoint + encodeURIComponent(url);
+            }
+            
+            // Set iframe src
+            proxyFrame.src = proxyUrl;
+            
+            // Show loading message
+            showStatus(`Loading via ${proxyService.name} proxy...`, 'success');
+            
+            // Save the last used URL and proxy service in localStorage
+            localStorage.setItem('lastUrl', url);
+            localStorage.setItem('lastProxy', selectedProxyType);
+        }
+        
+        // Attach event listeners
+        accessButton.addEventListener('click', loadProxiedSite);
+        
+        urlInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                loadProxiedSite();
+            }
         });
-    }
-    
-    function showStatus(message, type) {
-      const statusElement = document.getElementById('status');
-      statusElement.textContent = message;
-      statusElement.className = type;
-      
-      if (type === 'success') {
-        setTimeout(() => {
-          statusElement.style.display = 'none';
-        }, 3000);
-      }
-    }
-  </script>
+        
+        // Quick access buttons
+        quickAccessButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                urlInput.value = this.getAttribute('data-url');
+                loadProxiedSite();
+            });
+        });
+        
+        // Load last used settings
+        window.addEventListener('DOMContentLoaded', function() {
+            const lastUrl = localStorage.getItem('lastUrl');
+            const lastProxy = localStorage.getItem('lastProxy');
+            
+            if (lastUrl) {
+                urlInput.value = lastUrl;
+            }
+            
+            if (lastProxy) {
+                const proxyRadio = document.getElementById(`proxy-${lastProxy}`);
+                if (proxyRadio) {
+                    proxyRadio.checked = true;
+                }
+            }
+        });
+    </script>
 </body>
 </html>
