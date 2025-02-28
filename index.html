@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced Web Proxy</title>
+  <title>Simple Working Proxy</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: #f0f2f5;
+      background-color: #f5f5f5;
     }
     .container {
       max-width: 800px;
@@ -17,232 +17,187 @@
       background-color: white;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     h1 {
-      color: #1a73e8;
+      color: #333;
       text-align: center;
-      margin-bottom: 30px;
     }
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
       font-weight: bold;
-      color: #333;
     }
     input[type="text"] {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
       font-size: 16px;
-      transition: border-color 0.3s;
-    }
-    input[type="text"]:focus {
-      border-color: #1a73e8;
-      outline: none;
-    }
-    .button-group {
-      display: flex;
-      gap: 10px;
     }
     button {
-      background-color: #1a73e8;
+      background-color: #4CAF50;
       color: white;
-      padding: 12px 20px;
+      padding: 10px 15px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s;
-      flex: 1;
     }
     button:hover {
-      background-color: #0d62c9;
+      background-color: #45a049;
     }
-    .proxy-container {
-      margin-top: 30px;
-    }
-    .settings-panel {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #f8f9fa;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-    }
-    .settings-title {
-      font-weight: bold;
-      margin-bottom: 10px;
-      display: block;
-    }
-    .option {
-      margin-bottom: 8px;
-    }
-    .proxy-frame {
-      width: 100%;
-      height: 600px;
-      border: 1px solid #ddd;
-      margin-top: 20px;
-      border-radius: 4px;
-    }
-    .disclaimer {
-      margin-top: 20px;
-      font-size: 12px;
-      color: #666;
-      line-height: 1.5;
-    }
-    .status {
-      margin-top: 15px;
+    #status {
+      margin-top: 10px;
       padding: 10px;
       border-radius: 4px;
       display: none;
     }
-    .status.success {
-      background-color: #e6f4ea;
-      color: #137333;
+    #status.error {
+      background-color: #ffebee;
+      color: #c62828;
       display: block;
     }
-    .status.error {
-      background-color: #fce8e6;
-      color: #c5221f;
+    #status.success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
       display: block;
+    }
+    #content {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      min-height: 400px;
+      overflow: auto;
+    }
+    .proxy-options {
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+    }
+    .proxy-option {
+      margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Advanced Web Proxy</h1>
+    <h1>Simple Working Proxy</h1>
+    
     <div class="form-group">
       <label for="url">Enter URL to access:</label>
       <input type="text" id="url" placeholder="https://example.com" value="https://example.com">
     </div>
     
-    <div class="settings-panel">
-      <span class="settings-title">Proxy Settings</span>
-      <div class="option">
-        <input type="radio" id="proxy-alloy" name="proxy-service" value="alloy" checked>
-        <label for="proxy-alloy">Alloy Proxy (Most compatible)</label>
+    <div class="proxy-options">
+      <div class="proxy-option">
+        <input type="radio" id="proxy1" name="proxy" value="https://api.allorigins.win/raw?url=" checked>
+        <label for="proxy1">AllOrigins Proxy</label>
       </div>
-      <div class="option">
-        <input type="radio" id="proxy-corsproxy" name="proxy-service" value="corsproxy">
-        <label for="proxy-corsproxy">CORS Proxy (Faster, limited compatibility)</label>
+      <div class="proxy-option">
+        <input type="radio" id="proxy2" name="proxy" value="https://corsproxy.io/?">
+        <label for="proxy2">CORS Proxy</label>
       </div>
-      <div class="option">
-        <input type="radio" id="proxy-ultraviolet" name="proxy-service" value="ultraviolet">
-        <label for="proxy-ultraviolet">Ultraviolet Proxy (Good for complex sites)</label>
+      <div class="proxy-option">
+        <input type="radio" id="proxy3" name="proxy" value="https://api.codetabs.com/v1/proxy?quest=">
+        <label for="proxy3">CodeTabs Proxy</label>
       </div>
     </div>
     
-    <div class="button-group">
-      <button onclick="loadUrl()">Access Website</button>
-      <button onclick="clearCache()" style="background-color: #5f6368;">Clear Cache</button>
-    </div>
+    <button onclick="fetchContent()">Load Website</button>
     
-    <div id="status-message" class="status"></div>
+    <div id="status"></div>
     
-    <div id="proxy-container" class="proxy-container">
-      <iframe id="proxy-frame" class="proxy-frame" title="Proxied Content" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
-    </div>
-    
-    <div class="disclaimer">
-      <p><strong>Note:</strong> This proxy is for educational and personal use only. Some websites may still be inaccessible due to server-side restrictions or advanced detection methods.</p>
-      <p>Always use responsibly and in accordance with applicable laws and terms of service.</p>
+    <div id="content">
+      <p>Enter a URL above and click "Load Website" to see the content here.</p>
     </div>
   </div>
 
   <script>
-    // Available proxy services
-    const proxyServices = {
-      alloy: "https://cdn.jsdelivr.net/gh/titaniumnetwork-dev/alloyproxy/public/index.html#",
-      corsproxy: "https://corsproxy.io/?",
-      ultraviolet: "https://uv.holyubofficial.net/service/go/" // Example UV proxy service
-    };
-    
-    function loadUrl() {
+    function fetchContent() {
       const url = document.getElementById('url').value;
-      const statusElement = document.getElementById('status-message');
+      const statusElement = document.getElementById('status');
+      const contentElement = document.getElementById('content');
+      const selectedProxy = document.querySelector('input[name="proxy"]:checked').value;
       
-      if (!url || !url.trim()) {
+      if (!url) {
         showStatus('Please enter a valid URL', 'error');
         return;
       }
       
-      try {
-        // Get selected proxy service
-        const selectedProxy = document.querySelector('input[name="proxy-service"]:checked').value;
-        const proxyUrl = proxyServices[selectedProxy] + encodeURIComponent(url);
-        
-        // Use different approach based on proxy type
-        const proxyFrame = document.getElementById('proxy-frame');
-        
-        if (selectedProxy === 'corsproxy') {
-          // Direct iframe for CORS proxy
-          proxyFrame.src = proxyUrl;
-        } else {
-          // For more complex proxies, might need to redirect
-          proxyFrame.src = proxyUrl;
-        }
-        
-        showStatus('Loading website through proxy...', 'success');
-        
-        // Store last successful URL in local storage
-        localStorage.setItem('lastProxyUrl', url);
-        localStorage.setItem('lastProxyService', selectedProxy);
-        
-      } catch (error) {
-        showStatus('Error loading the URL: ' + error.message, 'error');
-      }
+      showStatus('Loading content...', 'success');
+      
+      // Clear previous content
+      contentElement.innerHTML = '<p>Loading...</p>';
+      
+      const proxyUrl = selectedProxy + encodeURIComponent(url);
+      
+      fetch(proxyUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text();
+        })
+        .then(data => {
+          // Process the content to make it display correctly
+          // For HTML content, we'll need to fix relative URLs to absolute
+          let processedContent = data;
+          
+          // Create a temporary element to parse the HTML
+          const tempElement = document.createElement('div');
+          tempElement.innerHTML = processedContent;
+          
+          // Fix relative URLs in src and href attributes
+          const baseUrl = new URL(url);
+          const baseOrigin = baseUrl.origin;
+          const basePath = baseUrl.pathname.substring(0, baseUrl.pathname.lastIndexOf('/') + 1);
+          
+          // Fix links
+          tempElement.querySelectorAll('[src], [href]').forEach(element => {
+            ['src', 'href'].forEach(attr => {
+              if (element.hasAttribute(attr)) {
+                const value = element.getAttribute(attr);
+                if (value && !value.startsWith('http') && !value.startsWith('//') && !value.startsWith('#') && !value.startsWith('data:')) {
+                  if (value.startsWith('/')) {
+                    element.setAttribute(attr, baseOrigin + value);
+                  } else {
+                    element.setAttribute(attr, baseOrigin + basePath + value);
+                  }
+                }
+              }
+            });
+          });
+          
+          // Display the processed content
+          contentElement.innerHTML = tempElement.innerHTML;
+          
+          showStatus('Content loaded successfully!', 'success');
+        })
+        .catch(error => {
+          console.error('Error fetching the URL:', error);
+          showStatus('Error loading the URL: ' + error.message, 'error');
+          contentElement.innerHTML = '<p>Failed to load content. Try a different proxy server or URL.</p>';
+        });
     }
     
     function showStatus(message, type) {
-      const statusElement = document.getElementById('status-message');
+      const statusElement = document.getElementById('status');
       statusElement.textContent = message;
-      statusElement.className = 'status ' + type;
+      statusElement.className = type;
       
-      // Auto-hide success messages after 5 seconds
       if (type === 'success') {
         setTimeout(() => {
           statusElement.style.display = 'none';
-        }, 5000);
+        }, 3000);
       }
     }
-    
-    function clearCache() {
-      const frame = document.getElementById('proxy-frame');
-      frame.src = 'about:blank';
-      
-      // Clear localStorage
-      localStorage.removeItem('lastProxyUrl');
-      localStorage.removeItem('lastProxyService');
-      
-      showStatus('Cache and browsing history cleared', 'success');
-    }
-    
-    // Load last used configuration on page load
-    window.onload = function() {
-      const lastUrl = localStorage.getItem('lastProxyUrl');
-      const lastService = localStorage.getItem('lastProxyService');
-      
-      if (lastUrl) {
-        document.getElementById('url').value = lastUrl;
-      }
-      
-      if (lastService) {
-        const radioButton = document.getElementById('proxy-' + lastService);
-        if (radioButton) {
-          radioButton.checked = true;
-        }
-      }
-      
-      // Load the URL if available
-      if (lastUrl) {
-        loadUrl();
-      }
-    };
   </script>
 </body>
 </html>
